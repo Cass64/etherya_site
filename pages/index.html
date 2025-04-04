@@ -26,10 +26,10 @@
     <script>
         document.getElementById("login-form").addEventListener("submit", function(event) {
             event.preventDefault();
-
+        
             const enteredUsername = document.getElementById("username").value;
             const enteredPassword = document.getElementById("password").value;
-
+        
             // Envoyer les identifiants au serveur pour la vérification
             fetch('/login', {
                 method: 'POST',
@@ -41,15 +41,25 @@
                     password: enteredPassword
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return Promise.reject('Erreur de connexion');
+                }
+                return response.json();  // Assurer que la réponse est en format JSON
+            })
             .then(data => {
                 if (data.success) {
-                    window.location.href = "dashboard.html";
+                    window.location.href = "dashboard.html";  // Rediriger vers le tableau de bord
                 } else {
-                    document.getElementById("error-message").textContent = data.message;
+                    document.getElementById("error-message").textContent = data.message;  // Afficher l'erreur
                 }
+            })
+            .catch(error => {
+                console.error('Erreur de connexion:', error);
+                document.getElementById("error-message").textContent = 'Erreur de connexion, veuillez réessayer plus tard.';
             });
         });
+
     </script>
 </body>
 
