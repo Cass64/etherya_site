@@ -30,22 +30,25 @@ const User = mongoose.model('User', userSchema);
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username });
-  if (!user) {
-    return res.status(401).json({ success: false, message: "Utilisateur introuvable" });
-  }
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Utilisateur introuvable" });
+    }
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return res.status(401).json({ success: false, message: "Mot de passe incorrect" });
-  }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ success: false, message: "Mot de passe incorrect" });
+    }
 
+    // Connexion réussie
     res.json({ success: true, message: "Connexion réussie" });
   } catch (err) {
-    console.error("Erreur lors de la tentative de connexion : ", err);
-    res.status(500).json({ success: false, message: "Erreur du serveur" });
+    console.error("Erreur lors de la connexion :", err);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 });
+
 
 // Lancer le serveur
 app.listen(port, () => {
