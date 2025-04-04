@@ -26,16 +26,29 @@
     <script>
         document.getElementById("login-form").addEventListener("submit", function(event) {
             event.preventDefault();
+
             const enteredUsername = document.getElementById("username").value;
             const enteredPassword = document.getElementById("password").value;
-            const storedUsername = "{{ USERNAME }}";
-            const storedPassword = "{{ MDP }}";
 
-            if (enteredUsername === storedUsername && enteredPassword === storedPassword) {
-                window.location.href = "dashboard.html";
-            } else {
-                document.getElementById("error-message").textContent = "Identifiants incorrects. Veuillez réessayer.";
-            }
+            // Envoyer les identifiants au serveur pour la vérification
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: enteredUsername,
+                    password: enteredPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = "dashboard.html";
+                } else {
+                    document.getElementById("error-message").textContent = data.message;
+                }
+            });
         });
     </script>
 </body>
