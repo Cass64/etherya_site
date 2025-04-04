@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - Etherya</title>
     <link rel="stylesheet" href="../styles/style.css">
 </head>
-<body class="body_co">
+
+<body>
     <div class="login-container">
-        <h1>Connexion</h1>
+        <h2>Connexion</h2>
         <form id="login-form">
-            <div class="input-group">
-                <label for="username">Nom d'utilisateur</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" required>
-            </div>
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required>
+
             <button type="submit">Se connecter</button>
-            <p id="error-message" class="error-message"></p>
         </form>
+        <p id="error-message" class="error-message"></p>
     </div>
+
     <script>
         document.getElementById("login-form").addEventListener("submit", function(event) {
             event.preventDefault();
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            
-            // Variables définies via Render (exemple, à remplacer par tes valeurs réelles)
-            const validUsername = "admin";
-            const validPassword = "password123";
-            
-            if (username === validUsername && password === validPassword) {
+            const enteredUsername = document.getElementById("username").value;
+            const enteredPassword = document.getElementById("password").value;
+            const storedUsername = "{{ USERNAME }}";
+            const storedPassword = "{{ MDP }}";
+
+            if (enteredUsername === storedUsername && enteredPassword === storedPassword) {
                 window.location.href = "index.html";
             } else {
-                document.getElementById("error-message").textContent = "Identifiants incorrects";
+                document.getElementById("error-message").textContent = "Identifiants incorrects. Veuillez réessayer.";
             }
         });
     </script>
 </body>
+
 </html>
