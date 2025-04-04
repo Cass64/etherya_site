@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Etherya</title>
+    <link rel="stylesheet" href="../styles/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Connexion</h1>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Se connecter</button>
+            <p id="error-message" class="error-message"></p>
+        </form>
+    </div>
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            // Variables définies via Render (exemple, à remplacer par tes valeurs réelles)
+            const validUsername = "admin";
+            const validPassword = "password123";
+            
+            if (username === validUsername && password === validPassword) {
+                window.location.href = "dashboard.html";
+            } else {
+                document.getElementById("error-message").textContent = "Identifiants incorrects";
+            }
+        });
+    </script>
+</body>
+</html>
