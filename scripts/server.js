@@ -1,53 +1,46 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const bodyParser = require('body-parser');
+require('dotenv').config();  // Charge les variables d'environnement depuis un fichier .env
+
+const express = require("express");
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
 const app = express();
+const port = process.env.PORT || 3000;
 
-// Connexion à MongoDB (modifie l'URL pour correspondre à ta base de données)
-mongoose.connect('mongodb://localhost:27017/etherya', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log("MongoDB connecté"))
-.catch((err) => console.log(err));
+// Middleware pour parser les requêtes JSON
+app.use(express.json());
 
-// Middleware pour parser le corps de la requête
-app.use(bodyParser.json());
+// Connexion à MongoDB en utilisant l'URI stockée dans les variables d'environnement
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Connecté à MongoDB"))
+  .catch((error) => console.error("Erreur de connexion MongoDB : ", error));
 
-// Modèle utilisateur MongoDB
-const User = mongoose.model('User', new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
-}));
+// Exemple de schéma utilisateur pour valider la connexion
+const userSchema = new mongoose.Schema({
+  username: String,
+  password: String
+},{ collection: 'loggin_site' });
 
-// Route de connexion
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+const User = mongoose.model('User', userSchema);
 
-    try {
-        // Recherche l'utilisateur dans la base de données
-        const user = await User.findOne({ username });
+// Route pour valider la connexion
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
 
-        if (!user) {
-            return res.json({ success: false, message: 'Utilisateur non trouvé' });
-        }
+  const user = await User.findOne({ username });
+  if (!user) {
+    return res.status(401).send("Utilisateur introuvable");
+  }
 
-        // Comparer le mot de passe hashé avec celui fourni
-        const isMatch = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.status(401).send("Mot de passe incorrect");
+  }
 
-        if (isMatch) {
-            return res.json({ success: true });
-        } else {
-            return res.json({ success: false, message: 'Mot de passe incorrect' });
-        }
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ success: false, message: 'Erreur serveur' });
-    }
+  res.send("Connexion réussie");
 });
 
 // Lancer le serveur
-app.listen(3000, () => {
-    console.log('Serveur démarré sur le port 3000');
+app.listen(port, () => {
+  console.log(`Serveur en écoute sur le port ${port}`);
 });
