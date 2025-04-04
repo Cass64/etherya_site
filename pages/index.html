@@ -30,7 +30,6 @@
             const enteredUsername = document.getElementById("username").value;
             const enteredPassword = document.getElementById("password").value;
         
-            // Envoyer les identifiants au serveur pour la vérification
             fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -41,26 +40,33 @@
                     password: enteredPassword
                 })
             })
-            .then(response => {
+            .then(async (response) => {
+                const contentType = response.headers.get("content-type");
+        
                 if (!response.ok) {
-                    return Promise.reject('Erreur de connexion');
+                    if (contentType && contentType.includes("application/json")) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || "Erreur de connexion");
+                    } else {
+                        throw new Error("Erreur de connexion inattendue");
+                    }
                 }
-                return response.json();  // Assurer que la réponse est en format JSON
+        
+                return response.json();
             })
             .then(data => {
                 if (data.success) {
-                    window.location.href = "dashboard.html";  // Rediriger vers le tableau de bord
+                    window.location.href = "dashboard.html";
                 } else {
-                    document.getElementById("error-message").textContent = data.message;  // Afficher l'erreur
+                    document.getElementById("error-message").textContent = data.message;
                 }
             })
             .catch(error => {
                 console.error('Erreur de connexion:', error);
-                document.getElementById("error-message").textContent = 'Erreur de connexion, veuillez réessayer plus tard.';
+                document.getElementById("error-message").textContent = error.message;
             });
         });
-
-    </script>
+</script>
 </body>
 
 </html>
