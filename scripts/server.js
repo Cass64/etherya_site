@@ -30,16 +30,15 @@ const User = mongoose.model('User', userSchema);
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(401).json({ success: false, message: "Utilisateur introuvable" });
-    }
+  const user = await User.findOne({ username });
+  if (!user) {
+    return res.status(401).json({ success: false, message: "Utilisateur introuvable" });
+  }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(401).json({ success: false, message: "Mot de passe incorrect" });
-    }
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.status(401).json({ success: false, message: "Mot de passe incorrect" });
+  }
 
     res.json({ success: true, message: "Connexion réussie" });
   } catch (err) {
