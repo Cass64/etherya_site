@@ -14,12 +14,14 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connecté à MongoDB"))
   .catch((error) => console.error("Erreur de connexion MongoDB : ", error));
+    process.exit(1);  // Arrêter le serveur en cas de problème de connexion
+  });
 
 // Exemple de schéma utilisateur pour valider la connexion
 const userSchema = new mongoose.Schema({
   username: String,
   password: String
-},{ collection: 'loggin_site' });
+}, { collection: 'loggin_site' });
 
 const User = mongoose.model('User', userSchema);
 
@@ -27,17 +29,22 @@ const User = mongoose.model('User', userSchema);
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username });
-  if (!user) {
-    return res.status(401).send("Utilisateur introuvable");
-  }
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Utilisateur introuvable" });
+    }
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return res.status(401).send("Mot de passe incorrect");
-  }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ success: false, message: "Mot de passe incorrect" });
+    }
 
-  res.send("Connexion réussie");
+    res.json({ success: true, message: "Connexion réussie" });
+  } catch (err) {
+    console.error("Erreur lors de la tentative de connexion : ", err);
+    res.status(500).json({ success: false, message: "Erreur du serveur" });
+  }
 });
 
 // Lancer le serveur
